@@ -6,6 +6,7 @@ int main(void){
     int opcion;
 
 
+
     cout << "Welcome to the police and thief racing game" << endl;
     cout << "   ______________ " << endl;
     cout << "   |     |      |  " << endl;
@@ -15,7 +16,10 @@ int main(void){
     cout << "   |  |       |   |" << endl;
     cout << "   ---         ---" << endl;
 
-
+    cout << "Ingrese usuario 1 su nombre: " << endl;
+    cin >> usuario1;
+    cout << "Ingrese usuario 2 su nombre: " << endl;
+    cin >> usuario2;
 
 
     cout << "Elije el nivel de dificultad del juego" << endl;
@@ -47,5 +51,7 @@ int main(void){
         cout << "Elije una opcion entre 1 y 4" << endl;
         break;
     }
+
+    
     return 0;
 }
