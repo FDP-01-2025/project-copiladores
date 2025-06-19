@@ -7,16 +7,15 @@ int main(void){
 
 
     cout << "Welcome to the police and thief racing game" << endl;
-    cout << "        ______________________ " << endl;
-    cout << "        |          |          |  " << endl;
-    cout << "        |          |          |" << endl;
-    cout << "  ________________________________________" << endl;
-    cout << "|                                         |" << endl;
-    cout << "|                                         | " << endl;
-    cout << "  ________________________________________ " << endl;
-    cout << "       |       |            |       |" << endl;
-    cout << "       |       |            |       |" << endl;
-    cout << "       ---------            ---------" << endl;
+    cout << "   ______________ " << endl;
+    cout << "   |     |      |  " << endl;
+    cout << " ___________________" << endl;
+    cout << "|                   |" << endl;
+    cout << " ___________________ " << endl;
+    cout << "   |  |       |   |" << endl;
+    cout << "   ---         ---" << endl;
+
+
 
 
     cout << "Elije el nivel de dificultad del juego" << endl;
