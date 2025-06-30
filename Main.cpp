@@ -11,7 +11,7 @@ int main(void){
         mostrarDado(dado);
         avanzar(tablero);
         jugador_avanza(tablero, dado, 6, 6);
-    }while(3 < 1);
+    }while(!juego_finalizado);
     
     return 0;
 }

@@ -93,5 +93,4 @@ void jugador_avanza(string M[][6], int dado, int nfilas, int ncolumnas){
             }
         }
     }
-    return;
 }
