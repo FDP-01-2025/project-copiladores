@@ -85,12 +85,11 @@ void jugador_avanza(string M[][6], int dado, int nfilas, int ncolumnas){
     string Persona = "@";
     int casilla_global = 0;
 
-    for(int i = 0; i < nfilas; i++){
-        for(int j = 0; j < ncolumnas; j++){
-            if(M[i][j].find(to_string(dado)) != string::npos){
-                casilla_global += dado;
-                M[i][j] = Persona; //TODO: Agregar Personaje
-            }
-        }
-    }
+    casilla_global += dado - 1;
+    int fila = casilla_global / ncolumnas;
+    int columna = casilla_global % ncolumnas;
+    
+    M[fila][columna] = "@";
+
+    //TODO: Borrar la posicion actual del jugador por cada vuelta y hacer que la posicion del jugador se acumule a modo que recorra todas las casillas.
 }
