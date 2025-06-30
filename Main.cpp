@@ -5,10 +5,11 @@ int main(void){
     bool juego_finalizado = false;
     int dado;
     string lanzar;
+    srand(time(NULL)); // Inicializa la semilla una sola vez
 
     do{
         mostrar_tablero(tablero, 6, 6);
-        dado = lanzar_dado(lanzar);
+        dado = lanzar_dado();
         mostrarDado(dado);
         avanzar(tablero);
         jugador_avanza(tablero, dado, 6, 6);

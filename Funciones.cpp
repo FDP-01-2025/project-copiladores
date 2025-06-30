@@ -15,29 +15,6 @@ void mostrar_tablero(string M[][6], int nfilas, int ncolumnas){
     cout << "\n";
 }
 
-int lanzar_dado(string lanzar){
-
-    int dado;
-    srand(time(NULL)); // Para obtener resultados diferentes cada vez
-
-    cout << "=== Simulador de Dado ===\n";
-    cout << "Presiona ENTER para lanzar el dado: ";
-    getline(cin, lanzar);
-
-    // Lanzamiento del dado
-    dado = 1 + rand() % 6;
-
-    cout << "\nLanzando el dado...\n";
-    cout << "Ha salido el numero: " << dado << "\n";
-
-    // Mostrar el dibujo del dado
-    mostrarDado(dado);
-
-    cout << "Avanzas " << dado << " casillas en el juego.\n";
-
-    return 0;
-}
-
 void mostrarDado(int num) {
     cout << "\n+-------+\n";
     switch (num) {
@@ -73,6 +50,20 @@ void mostrarDado(int num) {
             break;
     }
     cout << "+-------+\n";
+}
+
+int lanzar_dado() {
+    cout << "=== Simulador de Dado ===\n";
+    cout << "Presiona ENTER para lanzar el dado...";
+    cin.ignore(); // Espera que el usuario presione ENTER
+
+    int resultado = 1 + rand() % 6;
+
+    cout << "\nLanzando el dado...\n";
+    cout << "Ha salido el número: " << resultado << "\n";
+    cout << "Avanzas " << resultado << " casillas en el juego.\n";
+
+    return resultado;
 }
 
 void avanzar(string M[][6]){
