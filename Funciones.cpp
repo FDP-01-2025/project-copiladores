@@ -67,14 +67,15 @@ int lanzar_dado() {
 }
 
 void avanzar(string M[][6]){
-    int dado;
+    int dado = 0;
     int n = 0;
     int casilla_global = 0;
     int fila, columna;
     casilla_global += dado;
-    for(int i = 0; i < dado; i++){
-        fila = i / 10;
-        columna = i % 10;
+    for(int i = 1; i <= dado; i++){
+        casilla_global++;
+        int fila = casilla_global / 6;
+        int columna = casilla_global % 6;
         cout << "Usted está en la casilla: " << casilla_global << "\n";
     }
 } 
@@ -82,7 +83,7 @@ void avanzar(string M[][6]){
 void jugador_avanza(string M[][6], int dado, int nfilas, int ncolumnas){
 
     string Persona = "@";
-    int casilla_global;
+    int casilla_global = 0;
 
     for(int i = 0; i < nfilas; i++){
         for(int j = 0; j < ncolumnas; j++){
@@ -94,4 +95,3 @@ void jugador_avanza(string M[][6], int dado, int nfilas, int ncolumnas){
     }
     return;
 }
-
