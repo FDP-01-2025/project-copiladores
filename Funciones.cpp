@@ -60,7 +60,7 @@ int lanzar_dado() {
     int resultado = 1 + rand() % 6;
 
     cout << "\nLanzando el dado...\n";
-    cout << "Ha salido el número: " << resultado << "\n";
+    cout << "Ha salido el numero: " << resultado << "\n";
     cout << "Avanzas " << resultado << " casillas en el juego.\n";
 
     return resultado;
@@ -76,20 +76,23 @@ void avanzar(string M[][6]){
         casilla_global++;
         int fila = casilla_global / 6;
         int columna = casilla_global % 6;
-        cout << "Usted está en la casilla: " << casilla_global << "\n";
+        cout << "Usted esta en la casilla: " << casilla_global << "\n";
     }
 } 
 
-void jugador_avanza(string M[][6], int dado, int nfilas, int ncolumnas){
-
+void jugador_avanza(string M[][6], int &pos_jugador, int dado, int nfilas, int ncolumnas) {
     string Persona = "@";
-    int casilla_global = 0;
+    // Borra la posición anterior
+    int fila_ant = (pos_jugador - 1) / 6;
+    int col_ant = (pos_jugador - 1) % 6;
+    M[fila_ant][col_ant] = to_string(pos_jugador);
 
-    casilla_global += dado - 1;
-    int fila = casilla_global / ncolumnas;
-    int columna = casilla_global % ncolumnas;
-    
-    M[fila][columna] = "@";
+    // Avanza
+    pos_jugador += dado;
+    if (pos_jugador > 36) pos_jugador = 36;
 
-    //TODO: Borrar la posicion actual del jugador por cada vuelta y hacer que la posicion del jugador se acumule a modo que recorra todas las casillas.
+    int fila = (pos_jugador - 1) / 6;
+    int col = (pos_jugador - 1) % 6;
+    M[fila][col] = Persona;
 }
+   
