@@ -75,41 +75,25 @@ int lanzar_dado()
     return resultado;
 }
 
-void avanzar(string M[][6])
-{
-    int dado = 0;
-    int n = 0;
-    int casilla_global = 0;
-    int fila, columna;
-    casilla_global += dado;
-    for (int i = 1; i <= dado; i++)
-    {
-        casilla_global++;
-        int fila = casilla_global / 6;
-        int columna = casilla_global % 6;
-        cout << "Usted está en la casilla: " << casilla_global << "\n";
-    }
-}
+
+    
+
 
 void casilla_a_coordenadas(int casilla, int &fila, int &col)
-{ // se convierten las cassillas en coordenadas
-    if (casilla >= 1 && casilla <= 6)
-    { // Arriba
+{
+    if (casilla >= 1 && casilla <= 6) { // Fila de arriba 
         fila = 0;
         col = casilla - 1;
     }
-    else if (casilla >= 7 && casilla <= 10)
-    { // Derecha
+    else if (casilla >= 7 && casilla <= 11) { // Columna derecha 
         fila = casilla - 6;
         col = 5;
     }
-    else if (casilla >= 11 && casilla <= 15)
-    { // Abajo
+    else if (casilla >= 12 && casilla <= 16) { // Fila de abajo 
         fila = 5;
-        col = 16 - casilla;
+        col = 17 - casilla;
     }
-    else if (casilla >= 16 && casilla <= 20)
-    { // Izquierda
+    else if (casilla >= 17 && casilla <= 20) { // Columna izquierda 
         fila = 21 - casilla;
         col = 0;
     }
@@ -120,7 +104,7 @@ void jugador_avanza(string M[][6], int &pos_jugador, int dado, int nfilas, int n
     int fila_ant, col_ant;
     casilla_a_coordenadas(pos_jugador, fila_ant, col_ant);
     // Restaura el número original
-    M[fila_ant][col_ant] = (pos_jugador < 10 ? " " : "") + to_string(pos_jugador) + " ";
+    M[fila_ant][col_ant] = (pos_jugador < 10 ? " " : " ") + to_string(pos_jugador) + " ";
 
     pos_jugador += dado;
     if (pos_jugador > 20)
@@ -128,5 +112,5 @@ void jugador_avanza(string M[][6], int &pos_jugador, int dado, int nfilas, int n
 
     int fila, col;
     casilla_a_coordenadas(pos_jugador, fila, col);
-    M[fila][col] = "@";
+    M[fila][col] = " @ ";
 }
