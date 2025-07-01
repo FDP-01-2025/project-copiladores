@@ -1,13 +1,19 @@
 #include "Header.h"
 
-bool juego_finalizado(){
-    
+// agregue juego_finalizado
+// Ahora recibe la posición del jugador y retorna true si llegó o pasó la meta
+bool juego_finalizado(int pos_jugador)
+{
+    return pos_jugador >= 20;
 }
 
-void mostrar_tablero(string M[][6], int nfilas, int ncolumnas){
-    for(int i = 0; i < nfilas; i++){
+void mostrar_tablero(string M[][6], int nfilas, int ncolumnas)
+{
+    for (int i = 0; i < nfilas; i++)
+    {
         cout << "[ ";
-        for(int j = 0; j < ncolumnas; j++){
+        for (int j = 0; j < ncolumnas; j++)
+        {
             cout << M[i][j] << " ";
         }
         cout << "]\n";
@@ -15,47 +21,50 @@ void mostrar_tablero(string M[][6], int nfilas, int ncolumnas){
     cout << "\n";
 }
 
-void mostrarDado(int num) {
+void mostrarDado(int num)
+{
     cout << "\n+-------+\n";
-    switch (num) {
-        case 1:
-            cout << "|       |\n";
-            cout << "|   *   |\n";
-            cout << "|       |\n";
-            break;
-        case 2:
-            cout << "| *     |\n";
-            cout << "|       |\n";
-            cout << "|     * |\n";
-            break;
-        case 3:
-            cout << "| *     |\n";
-            cout << "|   *   |\n";
-            cout << "|     * |\n";
-            break;
-        case 4:
-            cout << "| *   * |\n";
-            cout << "|       |\n";
-            cout << "| *   * |\n";
-            break;
-        case 5:
-            cout << "| *   * |\n";
-            cout << "|   *   |\n";
-            cout << "| *   * |\n";
-            break;
-        case 6:
-            cout << "| *   * |\n";
-            cout << "| *   * |\n";
-            cout << "| *   * |\n";
-            break;
+    switch (num)
+    {
+    case 1:
+        cout << "|       |\n";
+        cout << "|   *   |\n";
+        cout << "|       |\n";
+        break;
+    case 2:
+        cout << "| *     |\n";
+        cout << "|       |\n";
+        cout << "|     * |\n";
+        break;
+    case 3:
+        cout << "| *     |\n";
+        cout << "|   *   |\n";
+        cout << "|     * |\n";
+        break;
+    case 4:
+        cout << "| *   * |\n";
+        cout << "|       |\n";
+        cout << "| *   * |\n";
+        break;
+    case 5:
+        cout << "| *   * |\n";
+        cout << "|   *   |\n";
+        cout << "| *   * |\n";
+        break;
+    case 6:
+        cout << "| *   * |\n";
+        cout << "| *   * |\n";
+        cout << "| *   * |\n";
+        break;
     }
     cout << "+-------+\n";
 }
 
-int lanzar_dado() {
+int lanzar_dado()
+{
     cout << "=== Simulador de Dado ===\n";
     cout << "Presiona ENTER para lanzar el dado...";
-    cin.ignore(); // Espera que el usuario presione ENTER
+    cin.ignore();
 
     int resultado = 1 + rand() % 6;
 
@@ -66,33 +75,58 @@ int lanzar_dado() {
     return resultado;
 }
 
-void avanzar(string M[][6]){
+void avanzar(string M[][6])
+{
     int dado = 0;
     int n = 0;
     int casilla_global = 0;
     int fila, columna;
     casilla_global += dado;
-    for(int i = 1; i <= dado; i++){
+    for (int i = 1; i <= dado; i++)
+    {
         casilla_global++;
         int fila = casilla_global / 6;
         int columna = casilla_global % 6;
-        cout << "Usted esta en la casilla: " << casilla_global << "\n";
+        cout << "Usted está en la casilla: " << casilla_global << "\n";
     }
-} 
-
-void jugador_avanza(string M[][6], int &pos_jugador, int dado, int nfilas, int ncolumnas) {
-    string Persona = "@";
-    // Borra la posición anterior
-    int fila_ant = (pos_jugador - 1) / 6;
-    int col_ant = (pos_jugador - 1) % 6;
-    M[fila_ant][col_ant] = to_string(pos_jugador);
-
-    // Avanza
-    pos_jugador += dado;
-    if (pos_jugador > 36) pos_jugador = 36;
-
-    int fila = (pos_jugador - 1) / 6;
-    int col = (pos_jugador - 1) % 6;
-    M[fila][col] = Persona;
 }
-   
+
+void casilla_a_coordenadas(int casilla, int &fila, int &col)
+{ // se convierten las cassillas en coordenadas
+    if (casilla >= 1 && casilla <= 6)
+    { // Arriba
+        fila = 0;
+        col = casilla - 1;
+    }
+    else if (casilla >= 7 && casilla <= 10)
+    { // Derecha
+        fila = casilla - 6;
+        col = 5;
+    }
+    else if (casilla >= 11 && casilla <= 15)
+    { // Abajo
+        fila = 5;
+        col = 16 - casilla;
+    }
+    else if (casilla >= 16 && casilla <= 20)
+    { // Izquierda
+        fila = 21 - casilla;
+        col = 0;
+    }
+}
+
+void jugador_avanza(string M[][6], int &pos_jugador, int dado, int nfilas, int ncolumnas)
+{
+    int fila_ant, col_ant;
+    casilla_a_coordenadas(pos_jugador, fila_ant, col_ant);
+    // Restaura el número original
+    M[fila_ant][col_ant] = (pos_jugador < 10 ? " " : "") + to_string(pos_jugador) + " ";
+
+    pos_jugador += dado;
+    if (pos_jugador > 20)
+        pos_jugador = 20;
+
+    int fila, col;
+    casilla_a_coordenadas(pos_jugador, fila, col);
+    M[fila][col] = "@";
+}
