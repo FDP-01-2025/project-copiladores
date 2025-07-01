@@ -2,7 +2,13 @@
 #include <string>
 #include <cstdlib>
 #include <ctime>
+#include <vector>
 using namespace std;
+
+struct CasillaEspecial {
+    int posicion;
+    bool avanza; // true = avanza, false = retrocede
+};
 
 void mostrar_tablero(string M[][6], int nfilas, int ncolumnas);
 int lanzar_dado();
@@ -10,7 +16,9 @@ void mostrarDado(int num);
 void casilla_a_coordenadas(int casilla, int &fila, int &col);
 bool juego_finalizado(int pos_jugador);
 void jugador_avanza(string M[][6], int &pos_jugador, int dado, int nfilas, int ncolumnas, string simbolo);
+int mostrar_menu();
 void pedir_nombres(string &nombre1, string &nombre2);
+string valor_original(int casilla);
 
 int lanzar_dado() {
     cout << "=== Lanzar dado ===\n";
@@ -57,11 +65,11 @@ string valor_original(int casilla) {
 void jugador_avanza(string M[][6], int &pos_jugador, int dado, int nfilas, int ncolumnas, string simbolo) {
     int fila_ant, col_ant;
     casilla_a_coordenadas(pos_jugador, fila_ant, col_ant);
-    M[fila_ant][col_ant] = valor_original(pos_jugador); // restaurar valor original
+    M[fila_ant][col_ant] = valor_original(pos_jugador);
 
     pos_jugador += dado;
-    if (pos_jugador > 20)
-        pos_jugador = 20;
+    if (pos_jugador > 20) pos_jugador = 20;
+    if (pos_jugador < 1) pos_jugador = 1;
 
     int fila, col;
     casilla_a_coordenadas(pos_jugador, fila, col);
@@ -83,6 +91,19 @@ bool juego_finalizado(int pos_jugador) {
     return pos_jugador >= 20;
 }
 
+int mostrar_menu() {
+    int opcion;
+    cout << "\n=== MENU DE JUEGO ===\n";
+    cout << "1. Nivel facil\n";
+    cout << "2. Nivel intermedio\n";
+    cout << "3. Nivel dificil\n";
+    cout << "4. Salir\n";
+    cout << "Seleccione una opcion: ";
+    cin >> opcion;
+    cin.ignore();
+    return opcion;
+}
+
 void pedir_nombres(string &nombre1, string &nombre2) {
     cout << "Ingrese el nombre del Jugador 1 (Policia): ";
     getline(cin, nombre1);
@@ -90,22 +111,70 @@ void pedir_nombres(string &nombre1, string &nombre2) {
     getline(cin, nombre2);
 }
 
-
-
 int main() {
     srand(time(NULL));
 
-    string nombre1, nombre2;
-    string inicial1, inicial2;
-
     cout << "=== Bienvenidos al juego de carreras Ladron y Policia ===\n\n";
-    pedir_nombres(nombre1, nombre2);
-    inicial1 = nombre1.substr(0, 1);
-    inicial2 = nombre2.substr(0, 1);
+     cout << "                                 ____________ \n";   
+    cout << "                     --          |     |      |  \n";
+    cout << "         --             --     ___________________\n";
+    cout << "              --              |                   |\n";
+    cout << "                 --            ___________________ \n";
+    cout << "        --               --      |  |       |   |\n";
+    cout << "                    --           ---         ---\n";
+    cout << "                  ______________ \n";   
+    cout << "          --      |     |      |  \n";
+    cout << "    --          ___________________\n";
+    cout << "--   --        |                   |\n";
+    cout << "          --    ___________________ \n";
+    cout << "  --   --        |  |       |   |\n";
+    cout << " --        --     ---         ---\n";
 
-    int pos_jugador1 = 1;
-    int pos_jugador2 = 1;
-    int turno = 1;
+
+    int opcion = mostrar_menu();
+    if (opcion == 4) {
+        cout << "Saliendo del juego...\n";
+        return 0;
+    }
+    if (opcion < 1 || opcion > 4) {
+        cout << "Opcion no valida. Fin del programa.\n";
+        return 0;
+    }
+
+    vector<CasillaEspecial> especiales;
+    if (opcion == 1) {
+        cout << "\nHas elegido el Nivel Facil. Generando casillas especiales...\n";
+
+        while (especiales.size() < 3) {
+            int pos = 2 + rand() % 18;
+            bool repetido = false;
+            for (auto &c : especiales) {
+                if (c.posicion == pos) { repetido = true; break; }
+            }
+            if (!repetido) especiales.push_back({pos, true});
+        }
+
+        while (true) {
+            int pos = 2 + rand() % 18;
+            bool repetido = false;
+            for (auto &c : especiales) {
+                if (c.posicion == pos) { repetido = true; break; }
+            }
+            if (!repetido) {
+                especiales.push_back({pos, false});
+                break;
+            }
+        }
+
+        
+    }
+
+    string nombre1, nombre2;
+    pedir_nombres(nombre1, nombre2);
+    string inicial1 = nombre1.substr(0, 1);
+    string inicial2 = nombre2.substr(0, 1);
+
+    int pos_jugador1 = 1, pos_jugador2 = 1, turno = 1;
 
     string tablero[6][6] = {
         {"1 ", "2 ", "3 ", "4 ", "5 ", "6 "},
@@ -116,7 +185,6 @@ int main() {
         {"16", "15", "14", "13", "12", "11"}
     };
 
-    // Posicionar jugadores
     int fila1, col1, fila2, col2;
     casilla_a_coordenadas(pos_jugador1, fila1, col1);
     tablero[fila1][col1] = " " + inicial1 + " ";
@@ -135,14 +203,33 @@ int main() {
             jugador_avanza(tablero, pos_jugador2, dado, 6, 6, inicial2);
         }
 
+        if (opcion == 1) {
+            int &pos_actual = (turno == 1) ? pos_jugador1 : pos_jugador2;
+            string simbolo = (turno == 1) ? inicial1 : inicial2;
+
+            for (auto &c : especiales) {
+                if (pos_actual == c.posicion) {
+                    int efecto = 1 + rand() % 4;
+                    if (c.avanza) {
+                        cout << "Casilla especial! Adelantas " << efecto << " posiciones!\n";
+                        jugador_avanza(tablero, pos_actual, efecto, 6, 6, simbolo);
+                    } else {
+                        cout << "Casilla trampa! Retrocedes " << efecto << " posiciones!\n";
+                        jugador_avanza(tablero, pos_actual, -efecto, 6, 6, simbolo);
+                    }
+                    break;
+                }
+            }
+        }
+
         mostrar_tablero(tablero);
 
         if (juego_finalizado(pos_jugador1)) {
-            cout  << nombre1 << " ha ganado la carrera! \n";
+            cout << nombre1 << " ha ganado la carrera!\n";
             break;
         }
         if (juego_finalizado(pos_jugador2)) {
-            cout << nombre2 << " ha ganado la carrera! \n";
+            cout << nombre2 << " ha ganado la carrera!\n";
             break;
         }
 
