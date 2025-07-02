@@ -11,10 +11,11 @@ int lanzar_dado();
 void mostrarDado(int num);
 void casilla_a_coordenadas(int casilla, int &fila, int &col);
 bool juego_finalizado(int pos_jugador);
-void jugador_avanza(string M[][6], int &pos_jugador, int dado, int nfilas, int ncolumnas, string simbolo, vector<int> &casillas_adelanto, vector<int> &casillas_retroceso);
+void jugador_avanza(string M[][6], int &pos_jugador, int dado, int nfilas, int ncolumnas, string simbolo);
 int mostrar_menu();
 void pedir_nombres(string &nombre1, string &nombre2);
-void generar_casillas_especiales(vector<int> &adelanto, vector<int> &retroceso, int num_adelanto, int num_retroceso);
+string valor_original(int casilla);
+void generar_casillas_especiales(vector<int> &adelanto, vector<int> &retroceso, int tipo);
 
 int lanzar_dado() {
     cout << "=== Lanzar dado ===\n";
@@ -58,7 +59,7 @@ string valor_original(int casilla) {
     return (casilla < 10 ? " " : "") + to_string(casilla);
 }
 
-void jugador_avanza(string M[][6], int &pos_jugador, int dado, int nfilas, int ncolumnas, string simbolo, vector<int> &casillas_adelanto, vector<int> &casillas_retroceso) {
+void jugador_avanza(string M[][6], int &pos_jugador, int dado, int nfilas, int ncolumnas, string simbolo) {
     int fila_ant, col_ant;
     casilla_a_coordenadas(pos_jugador, fila_ant, col_ant);
     M[fila_ant][col_ant] = valor_original(pos_jugador);
@@ -66,18 +67,6 @@ void jugador_avanza(string M[][6], int &pos_jugador, int dado, int nfilas, int n
     pos_jugador += dado;
     if (pos_jugador > 20)
         pos_jugador = 20;
-
-    if (find(casillas_adelanto.begin(), casillas_adelanto.end(), pos_jugador) != casillas_adelanto.end()) {
-        int extra = 1 + rand() % 4;
-        cout << "\nCasilla de impulso! Avanzas " << extra << " casillas extra!\n";
-        pos_jugador += extra;
-        if (pos_jugador > 20) pos_jugador = 20;
-    } else if (find(casillas_retroceso.begin(), casillas_retroceso.end(), pos_jugador) != casillas_retroceso.end()) {
-        int menos = 1 + rand() % 4;
-        cout << "\nCasilla trampa! Retrocedes " << menos << " casillas!\n";
-        pos_jugador -= menos;
-        if (pos_jugador < 1) pos_jugador = 1;
-    }
 
     int fila, col;
     casilla_a_coordenadas(pos_jugador, fila, col);
@@ -119,19 +108,20 @@ void pedir_nombres(string &nombre1, string &nombre2) {
     getline(cin, nombre2);
 }
 
-void generar_casillas_especiales(vector<int> &adelanto, vector<int> &retroceso, int num_adelanto, int num_retroceso) {
-    adelanto.clear();
-    retroceso.clear();
-    while (adelanto.size() < num_adelanto) {
-        int val = 2 + rand() % 18;
-        if (find(adelanto.begin(), adelanto.end(), val) == adelanto.end())
-            adelanto.push_back(val);
-    }
-    while (retroceso.size() < num_retroceso) {
-        int val = 2 + rand() % 18;
-        if (find(adelanto.begin(), adelanto.end(), val) == adelanto.end() &&
-            find(retroceso.begin(), retroceso.end(), val) == retroceso.end())
-            retroceso.push_back(val);
+void generar_casillas_especiales(vector<int> &adelanto, vector<int> &retroceso, int tipo) {
+    vector<int> disponibles;
+    for (int i = 2; i <= 19; ++i) disponibles.push_back(i);
+    random_shuffle(disponibles.begin(), disponibles.end());
+
+    if (tipo == 1) { // fácil
+        adelanto.assign(disponibles.begin(), disponibles.begin() + 3);
+        retroceso.assign(disponibles.begin() + 3, disponibles.begin() + 4);
+    } else if (tipo == 2) { // intermedio
+        adelanto.assign(disponibles.begin(), disponibles.begin() + 3);
+        retroceso.assign(disponibles.begin() + 3, disponibles.begin() + 6);
+    } else if (tipo == 3) { // difícil
+        adelanto.assign(disponibles.begin(), disponibles.begin() + 2);
+        retroceso.assign(disponibles.begin() + 2, disponibles.begin() + 8);
     }
 }
 
@@ -139,7 +129,7 @@ int main() {
     srand(time(NULL));
 
     cout << "=== Bienvenidos al juego de carreras Ladron y Policia ===\n\n";
-    cout << "                                 ____________ \n";   
+    cout << "                                 _____________ \n";   
     cout << "                     --          |     |      |  \n";
     cout << "         --             --     ___________________\n";
     cout << "              --              |                   |\n";
@@ -168,12 +158,10 @@ int main() {
     string inicial1 = nombre1.substr(0, 1);
     string inicial2 = nombre2.substr(0, 1);
 
-    vector<int> casillas_adelanto;
-    vector<int> casillas_retroceso;
-    if (opcion == 1) generar_casillas_especiales(casillas_adelanto, casillas_retroceso, 3, 1);
-    else if (opcion == 2) generar_casillas_especiales(casillas_adelanto, casillas_retroceso, 3, 3);
+    int pos_jugador1 = 1;
+    int pos_jugador2 = 1;
+    int turno = 1;
 
-    int pos_jugador1 = 1, pos_jugador2 = 1, turno = 1;
     string tablero[6][6] = {
         {"1 ", "2 ", "3 ", "4 ", "5 ", "6 "},
         {"20", "  ", "  ", "  ", "  ", "7 "},
@@ -182,6 +170,9 @@ int main() {
         {"17", "  ", "  ", "  ", "  ", "10"},
         {"16", "15", "14", "13", "12", "11"}
     };
+
+    vector<int> casillas_adelanto, casillas_retroceso;
+    generar_casillas_especiales(casillas_adelanto, casillas_retroceso, opcion);
 
     int fila1, col1, fila2, col2;
     casilla_a_coordenadas(pos_jugador1, fila1, col1);
@@ -195,10 +186,36 @@ int main() {
 
         if (turno == 1) {
             cout << "\nTurno de " << nombre1 << " (" << inicial1 << ")\n";
-            jugador_avanza(tablero, pos_jugador1, dado, 6, 6, inicial1, casillas_adelanto, casillas_retroceso);
+            jugador_avanza(tablero, pos_jugador1, dado, 6, 6, inicial1);
+
+            if (find(casillas_adelanto.begin(), casillas_adelanto.end(), pos_jugador1) != casillas_adelanto.end()) {
+                int extra = 1 + rand() % 4;
+                cout << "Casilla especial! Adelantas " << extra << " casillas.\n";
+                jugador_avanza(tablero, pos_jugador1, extra, 6, 6, inicial1);
+            }
+            if (find(casillas_retroceso.begin(), casillas_retroceso.end(), pos_jugador1) != casillas_retroceso.end()) {
+                int resta = 1 + rand() % 4;
+                cout << "Casilla trampa! Retrocedes " << resta << " casillas.\n";
+                pos_jugador1 -= resta;
+                if (pos_jugador1 < 1) pos_jugador1 = 1;
+                jugador_avanza(tablero, pos_jugador1, 0, 6, 6, inicial1);
+            }
         } else {
             cout << "\nTurno de " << nombre2 << " (" << inicial2 << ")\n";
-            jugador_avanza(tablero, pos_jugador2, dado, 6, 6, inicial2, casillas_adelanto, casillas_retroceso);
+            jugador_avanza(tablero, pos_jugador2, dado, 6, 6, inicial2);
+
+            if (find(casillas_adelanto.begin(), casillas_adelanto.end(), pos_jugador2) != casillas_adelanto.end()) {
+                int extra = 1 + rand() % 4;
+                cout << "Casilla especial! Adelantas " << extra << " casillas.\n";
+                jugador_avanza(tablero, pos_jugador2, extra, 6, 6, inicial2);
+            }
+            if (find(casillas_retroceso.begin(), casillas_retroceso.end(), pos_jugador2) != casillas_retroceso.end()) {
+                int resta = 1 + rand() % 4;
+                cout << "Casilla trampa! Retrocedes " << resta << " casillas.\n";
+                pos_jugador2 -= resta;
+                if (pos_jugador2 < 1) pos_jugador2 = 1;
+                jugador_avanza(tablero, pos_jugador2, 0, 6, 6, inicial2);
+            }
         }
 
         mostrar_tablero(tablero);
@@ -217,4 +234,5 @@ int main() {
 
     return 0;
 }
+
 
