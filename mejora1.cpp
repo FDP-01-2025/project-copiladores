@@ -3,22 +3,18 @@
 #include <cstdlib>
 #include <ctime>
 #include <vector>
+#include <algorithm>
 using namespace std;
-
-struct CasillaEspecial {
-    int posicion;
-    bool avanza; // true = avanza, false = retrocede
-};
 
 void mostrar_tablero(string M[][6], int nfilas, int ncolumnas);
 int lanzar_dado();
 void mostrarDado(int num);
 void casilla_a_coordenadas(int casilla, int &fila, int &col);
 bool juego_finalizado(int pos_jugador);
-void jugador_avanza(string M[][6], int &pos_jugador, int dado, int nfilas, int ncolumnas, string simbolo);
+void jugador_avanza(string M[][6], int &pos_jugador, int dado, int nfilas, int ncolumnas, string simbolo, vector<int> &casillas_adelanto, vector<int> &casillas_retroceso);
 int mostrar_menu();
 void pedir_nombres(string &nombre1, string &nombre2);
-string valor_original(int casilla);
+void generar_casillas_especiales(vector<int> &adelanto, vector<int> &retroceso, int num_adelanto, int num_retroceso);
 
 int lanzar_dado() {
     cout << "=== Lanzar dado ===\n";
@@ -62,14 +58,26 @@ string valor_original(int casilla) {
     return (casilla < 10 ? " " : "") + to_string(casilla);
 }
 
-void jugador_avanza(string M[][6], int &pos_jugador, int dado, int nfilas, int ncolumnas, string simbolo) {
+void jugador_avanza(string M[][6], int &pos_jugador, int dado, int nfilas, int ncolumnas, string simbolo, vector<int> &casillas_adelanto, vector<int> &casillas_retroceso) {
     int fila_ant, col_ant;
     casilla_a_coordenadas(pos_jugador, fila_ant, col_ant);
     M[fila_ant][col_ant] = valor_original(pos_jugador);
 
     pos_jugador += dado;
-    if (pos_jugador > 20) pos_jugador = 20;
-    if (pos_jugador < 1) pos_jugador = 1;
+    if (pos_jugador > 20)
+        pos_jugador = 20;
+
+    if (find(casillas_adelanto.begin(), casillas_adelanto.end(), pos_jugador) != casillas_adelanto.end()) {
+        int extra = 1 + rand() % 4;
+        cout << "\nCasilla de impulso! Avanzas " << extra << " casillas extra!\n";
+        pos_jugador += extra;
+        if (pos_jugador > 20) pos_jugador = 20;
+    } else if (find(casillas_retroceso.begin(), casillas_retroceso.end(), pos_jugador) != casillas_retroceso.end()) {
+        int menos = 1 + rand() % 4;
+        cout << "\nCasilla trampa! Retrocedes " << menos << " casillas!\n";
+        pos_jugador -= menos;
+        if (pos_jugador < 1) pos_jugador = 1;
+    }
 
     int fila, col;
     casilla_a_coordenadas(pos_jugador, fila, col);
@@ -111,11 +119,27 @@ void pedir_nombres(string &nombre1, string &nombre2) {
     getline(cin, nombre2);
 }
 
+void generar_casillas_especiales(vector<int> &adelanto, vector<int> &retroceso, int num_adelanto, int num_retroceso) {
+    adelanto.clear();
+    retroceso.clear();
+    while (adelanto.size() < num_adelanto) {
+        int val = 2 + rand() % 18;
+        if (find(adelanto.begin(), adelanto.end(), val) == adelanto.end())
+            adelanto.push_back(val);
+    }
+    while (retroceso.size() < num_retroceso) {
+        int val = 2 + rand() % 18;
+        if (find(adelanto.begin(), adelanto.end(), val) == adelanto.end() &&
+            find(retroceso.begin(), retroceso.end(), val) == retroceso.end())
+            retroceso.push_back(val);
+    }
+}
+
 int main() {
     srand(time(NULL));
 
     cout << "=== Bienvenidos al juego de carreras Ladron y Policia ===\n\n";
-     cout << "                                 ____________ \n";   
+    cout << "                                 ____________ \n";   
     cout << "                     --          |     |      |  \n";
     cout << "         --             --     ___________________\n";
     cout << "              --              |                   |\n";
@@ -129,8 +153,6 @@ int main() {
     cout << "          --    ___________________ \n";
     cout << "  --   --        |  |       |   |\n";
     cout << " --        --     ---         ---\n";
-
-
     int opcion = mostrar_menu();
     if (opcion == 4) {
         cout << "Saliendo del juego...\n";
@@ -141,41 +163,17 @@ int main() {
         return 0;
     }
 
-    vector<CasillaEspecial> especiales;
-    if (opcion == 1) {
-        cout << "\nHas elegido el Nivel Facil. Generando casillas especiales...\n";
-
-        while (especiales.size() < 3) {
-            int pos = 2 + rand() % 18;
-            bool repetido = false;
-            for (auto &c : especiales) {
-                if (c.posicion == pos) { repetido = true; break; }
-            }
-            if (!repetido) especiales.push_back({pos, true});
-        }
-
-        while (true) {
-            int pos = 2 + rand() % 18;
-            bool repetido = false;
-            for (auto &c : especiales) {
-                if (c.posicion == pos) { repetido = true; break; }
-            }
-            if (!repetido) {
-                especiales.push_back({pos, false});
-                break;
-            }
-        }
-
-        
-    }
-
     string nombre1, nombre2;
     pedir_nombres(nombre1, nombre2);
     string inicial1 = nombre1.substr(0, 1);
     string inicial2 = nombre2.substr(0, 1);
 
-    int pos_jugador1 = 1, pos_jugador2 = 1, turno = 1;
+    vector<int> casillas_adelanto;
+    vector<int> casillas_retroceso;
+    if (opcion == 1) generar_casillas_especiales(casillas_adelanto, casillas_retroceso, 3, 1);
+    else if (opcion == 2) generar_casillas_especiales(casillas_adelanto, casillas_retroceso, 3, 3);
 
+    int pos_jugador1 = 1, pos_jugador2 = 1, turno = 1;
     string tablero[6][6] = {
         {"1 ", "2 ", "3 ", "4 ", "5 ", "6 "},
         {"20", "  ", "  ", "  ", "  ", "7 "},
@@ -197,29 +195,10 @@ int main() {
 
         if (turno == 1) {
             cout << "\nTurno de " << nombre1 << " (" << inicial1 << ")\n";
-            jugador_avanza(tablero, pos_jugador1, dado, 6, 6, inicial1);
+            jugador_avanza(tablero, pos_jugador1, dado, 6, 6, inicial1, casillas_adelanto, casillas_retroceso);
         } else {
             cout << "\nTurno de " << nombre2 << " (" << inicial2 << ")\n";
-            jugador_avanza(tablero, pos_jugador2, dado, 6, 6, inicial2);
-        }
-
-        if (opcion == 1) {
-            int &pos_actual = (turno == 1) ? pos_jugador1 : pos_jugador2;
-            string simbolo = (turno == 1) ? inicial1 : inicial2;
-
-            for (auto &c : especiales) {
-                if (pos_actual == c.posicion) {
-                    int efecto = 1 + rand() % 4;
-                    if (c.avanza) {
-                        cout << "Casilla especial! Adelantas " << efecto << " posiciones!\n";
-                        jugador_avanza(tablero, pos_actual, efecto, 6, 6, simbolo);
-                    } else {
-                        cout << "Casilla trampa! Retrocedes " << efecto << " posiciones!\n";
-                        jugador_avanza(tablero, pos_actual, -efecto, 6, 6, simbolo);
-                    }
-                    break;
-                }
-            }
+            jugador_avanza(tablero, pos_jugador2, dado, 6, 6, inicial2, casillas_adelanto, casillas_retroceso);
         }
 
         mostrar_tablero(tablero);
@@ -238,3 +217,4 @@ int main() {
 
     return 0;
 }
+
