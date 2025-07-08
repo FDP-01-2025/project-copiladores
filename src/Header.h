@@ -5,6 +5,12 @@
 #include <fstream> 
 using namespace std;
 
+struct Player{
+    string name;
+    string character;
+    int position;
+};
+
 void show_board(string M[][6], int nrows, int ncols);
 int roll_die();
 void showDie(int num);

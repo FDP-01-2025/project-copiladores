@@ -2,8 +2,8 @@
 
 // Added game_finished
 // Now it receives the player's position and returns true if they reached or passed the goal
-bool game_finished(int player_pos){
-    return player_pos >= 20;
+bool game_finished(const Player& player) {
+    return player.position >= 20;
 }
 
 void show_board(string M[][6], int nrows, int ncols){
@@ -54,9 +54,9 @@ void showDie(int num){
     cout << "+-------+\n";
 }
 
-int roll_die(int player){
+int roll_die(Player& player) {
     cout << "=== Die Simulator ===\n";
-    cout << "Player #" << player << "'s turn";
+    cout << "Turn of " << player.name << endl;
     cout << "Press ENTER to roll the die...";
     cin.ignore();
 
@@ -64,8 +64,7 @@ int roll_die(int player){
 
     cout << "\nRolling the die...\n";
     cout << "The number is: " << result << "\n";
-    cout << "Player #" << player << " you move " << result << " spaces in the game.\n";
-    player = ((player==1)?2:1);
+    cout << player.name << " moves " << result << " spaces.\n";
 
     return result;
 }
@@ -99,27 +98,23 @@ bool is_trap(int cell) {
     return false;
 }
 
-void player_advance(string M[][6], int &player_pos, string player, string character1, string character2, int die, int nrows, int ncols){
+void player_advance(string M[][6], Player& player, const Player& opponent, int die, int nrows, int ncols) {
     int prev_row, prev_col;
-    cell_to_coordinates(player_pos, prev_row, prev_col);
-    // Restore original number
-    M[prev_row][prev_col] = (player_pos < 10 ? " " : " ") + to_string(player_pos) + " ";
+    cell_to_coordinates(player.position, prev_row, prev_col);
+    M[prev_row][prev_col] = (player.position < 10 ? " " : " ") + to_string(player.position) + " ";
 
-    player_pos += die;
-    if (player_pos > 20){
-        player_pos = 20;
-    }
+    player.position += die;
+    if (player.position > 20)
+        player.position = 20;
 
-    if (is_trap(player_pos)) {
-        cout << "\n CAREFUL! Player #" << player << " you landed on a trap space and move back 3 positions.\n";
-        player_pos -= 3;
-        if (player_pos < 1)
-            player_pos = 1;
+    if (is_trap(player.position)) {
+        cout << "\nCARE! " << player.name << " landed on a trap and goes back 3 positions.\n";
+        player.position -= 3;
+        if (player.position < 1)
+            player.position = 1;
     }
 
     int row, col;
-    cell_to_coordinates(player_pos, row, col);
-    player = ((player=="1")?character1:character2);
-    M[row][col] = player;
-    player = ((player=="1")?"2":"1");
+    cell_to_coordinates(player.position, row, col);
+    M[row][col] = player.character;
 }
