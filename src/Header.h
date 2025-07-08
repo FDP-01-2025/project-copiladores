@@ -11,4 +11,5 @@ void mostrarDado(int num);
 void avanzar(string M[][6]);
 void casilla_a_coordenadas(int casilla, int &fila, int &col);
 void jugador_avanza(string M[][6], int &pos_jugador, int dado, int nfilas, int ncolumnas);
+bool es_trampa(int casilla);
 bool juego_finalizado(int pos_jugador);

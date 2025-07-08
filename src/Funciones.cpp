@@ -90,6 +90,16 @@ void casilla_a_coordenadas(int casilla, int &fila, int &col){
     }
 }
 
+bool es_trampa(int casilla) {
+    int trampas[] = {5, 10, 14, 18};
+    int cantidad_trampas = sizeof(trampas) / sizeof(trampas[0]);
+    for (int i = 0; i < cantidad_trampas; i++) {
+        if (casilla == trampas[i])
+            return true;
+    }
+    return false;
+}
+
 void jugador_avanza(string M[][6], int &pos_jugador, string jugador, string personaje1, string personaje2, int dado, int nfilas, int ncolumnas){
     int fila_ant, col_ant;
     casilla_a_coordenadas(pos_jugador, fila_ant, col_ant);
@@ -97,8 +107,16 @@ void jugador_avanza(string M[][6], int &pos_jugador, string jugador, string pers
     M[fila_ant][col_ant] = (pos_jugador < 10 ? " " : " ") + to_string(pos_jugador) + " ";
 
     pos_jugador += dado;
-    if (pos_jugador > 20)
+    if (pos_jugador > 20){
         pos_jugador = 20;
+    }
+
+    if (es_trampa(pos_jugador)) {
+        cout << "\n ¡CUIDADO! Jugador #" << jugador << " has caído en una casilla trampa y retrocede 3 posiciones.\n";
+        pos_jugador -= 3;
+        if (pos_jugador < 1)
+            pos_jugador = 1;
+    }
 
     int fila, col;
     casilla_a_coordenadas(pos_jugador, fila, col);
