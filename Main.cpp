@@ -1,14 +1,14 @@
 #include ".\src\Funciones.cpp"
 
 int main(){
-    int pos_jugador1 = 1;
-    int pos_jugador2 = 1;
-    string personaje1 = "@";
-    string personaje2 = "$";
-    int jugador_actual = 1;
-    int op;
+    int player1_pos = 1;
+    int player2_pos = 1;
+    string character1 = "@";
+    string character2 = "$";
+    int current_player = 1;
+    int option;
 
-    string tablero[6][6] = {
+    string board[6][6] = {
         {"1  ", "2  ", "3  ", "4  ", "5  ", "6  "},
         {"20 ", "   ", "   ", "   ", "   ", "7  "},
         {"19 ", "   ", "   ", "   ", "   ", "8  "},
@@ -19,73 +19,73 @@ int main(){
     srand(time(NULL));
 
     do {
-        cout << "===== BIENVENIDO ======\n";
+        cout << "===== WELCOME ======\n";
         cout << "== Thief and Policeman ==\n";
 
         cout << "===== MENU =====\n";
-        cout << "1. Jugar\n2. Escoger Personaje\n3. Salir\n";
-        cin >> op;
+        cout << "1. Play\n2. Choose Character\n3. Exit\n";
+        cin >> option;
         cin.ignore(); 
 
-        switch (op){
+        switch (option){
         case 1:
-                int fila1, col1, fila2, col2;
-                casilla_a_coordenadas(pos_jugador1, fila1, col1);
-                casilla_a_coordenadas(pos_jugador2, fila2, col2);
-                tablero[fila1][col1] = personaje1;
-                tablero[fila2][col2] = personaje2;
+            int row1, col1, row2, col2;
+            cell_to_coordinates(player1_pos, row1, col1);
+            cell_to_coordinates(player2_pos, row2, col2);
+            board[row1][col1] = character1;
+            board[row2][col2] = character2;
 
             while (true) {
-                mostrar_tablero(tablero, 6, 6);
-                int dado = lanzar_dado(jugador_actual);
-                mostrarDado(dado);
+                show_board(board, 6, 6);
+                int die = roll_die(current_player);
+                showDie(die);
 
-                if (jugador_actual == 1) {
-                    jugador_avanza(tablero, pos_jugador1, "1", personaje1, personaje2, dado, 6, 6);
-                    if (juego_finalizado(pos_jugador1)) {
-                        cout << "¡Jugador 1 ha ganado!\n";
+                if (current_player == 1) {
+                    player_advance(board, player1_pos, "1", character1, character2, die, 6, 6);
+                    if (game_finished(player1_pos)) {
+                        cout << "Player 1 has won!\n";
                         break;
                     }
                 } else {
-                    jugador_avanza(tablero, pos_jugador2, "2", personaje1, personaje2, dado, 6, 6);
-                    if (juego_finalizado(pos_jugador2)) {
-                        cout << "¡Jugador 2 ha ganado!\n";
+                    player_advance(board, player2_pos, "2", character1, character2, die, 6, 6);
+                    if (game_finished(player2_pos)) {
+                        cout << "Player 2 has won!\n";
                         break;
                     }
                 }
 
-                jugador_actual = (jugador_actual == 1) ? 2 : 1; // Alternar turno
+                current_player = (current_player == 1) ? 2 : 1; // Alternate turn
             }
             break;
 
         case 2:
             for (int i = 1; i <= 2; i++) {
-                int eleccion;
-                cout << "Jugador #" << i << ", elige tu personaje:\n";
+                int choice;
+                cout << "Player #" << i << ", choose your character:\n";
                 cout << "1. @\n2. $\n3. !\n4. *\n";
-                cin >> eleccion;
+                cin >> choice;
 
-                switch (eleccion) {
-                case 1: (i == 1) ? personaje1 = "@" : personaje2 = "@"; break;
-                case 2: (i == 1) ? personaje1 = "$" : personaje2 = "$"; break;
-                case 3: (i == 1) ? personaje1 = "!" : personaje2 = "!"; break;
-                case 4: (i == 1) ? personaje1 = "*" : personaje2 = "*"; break;
+                switch (choice) {
+                case 1: (i == 1) ? character1 = "@" : character2 = "@"; break;
+                case 2: (i == 1) ? character1 = "$" : character2 = "$"; break;
+                case 3: (i == 1) ? character1 = "!" : character2 = "!"; break;
+                case 4: (i == 1) ? character1 = "*" : character2 = "*"; break;
                 default:
-                    cout << "Opción inválida, se usará '@' por defecto.\n";
-                    (i == 1) ? personaje1 = "@" : personaje2 = "@"; break;
+                    cout << "Invalid option, '@' will be used by default.\n";
+                    (i == 1) ? character1 = "@" : character2 = "@"; break;
                 }
             }
             break;
 
         case 3:
-            cout << "Gracias por jugar, ¡hasta la próxima!\n";
+            cout << "Thanks for playing, see you next time!\n";
             break;
 
         default:
-            cout << "Opción inválida.\n";
+            cout << "Invalid option.\n";
             break;
         }
-    } while (op != 3);
+    } while (option != 3);
 
     return 0;
 }
